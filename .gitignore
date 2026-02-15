@@ -1,0 +1,29 @@
+# Node modules
+node_modules/
+**/node_modules/
+
+# Environment files
+.env
+backend/.env
+frontend/.env
+admin/.env
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Build folders
+frontend/dist/
+admin/dist/
+restaurant/dist/
+
+# Backend uploads (if not needed)
+backend/uploads/
+
+# Firebase service account
+backend/GoogleAuth/serviceAccountKey.json

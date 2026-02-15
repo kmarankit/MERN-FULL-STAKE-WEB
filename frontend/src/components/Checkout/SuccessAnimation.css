@@ -1,0 +1,93 @@
+/* Full-screen overlay to capture attention */
+.success-overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(8px);
+  z-index: 9999;
+  animation: fadeIn 0.3s ease-out forwards;
+}
+
+/* The big circle that expands to cover the screen */
+.success-circle-expander {
+  position: absolute;
+  width: 100px;
+  height: 100px;
+  background-color: #15803d; /* A slightly darker green */
+  border-radius: 50%;
+  animation: expand-and-fade 1.5s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+  animation-delay: 0.4s; /* Start after the tick appears */
+}
+
+/* Container for the green circle and the tick mark */
+.success-icon-container {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background: #16a34a; /* Dark green background */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 10px 30px rgba(22, 163, 74, 0.4); /* Gives a "3D" lifted effect */
+  transform: scale(0);
+  animation: pop-in 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55) forwards;
+}
+
+.success-tick {
+  width: 52px;
+  height: 52px;
+}
+
+/* Animates the drawing of the circle border of the tick */
+.success-tick-circle {
+  stroke-dasharray: 166;
+  stroke-dashoffset: 166;
+  stroke-width: 2;
+  stroke-miterlimit: 10;
+  stroke: #fff;
+  animation: stroke 0.6s cubic-bezier(0.65, 0, 0.45, 1) 0.3s forwards;
+}
+
+/* Animates the drawing of the checkmark */
+.success-tick-check {
+  stroke-dasharray: 48;
+  stroke-dashoffset: 48;
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke: #fff;
+  animation: stroke 0.4s cubic-bezier(0.65, 0, 0.45, 1) 0.8s forwards;
+}
+
+/* --- KEYFRAME ANIMATIONS --- */
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes pop-in {
+  to {
+    transform: scale(1);
+  }
+}
+
+@keyframes stroke {
+  100% {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes expand-and-fade {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(30); /* Scale large enough to cover any screen */
+    opacity: 0;
+  }
+}
