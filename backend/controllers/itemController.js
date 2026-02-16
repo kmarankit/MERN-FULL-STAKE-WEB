@@ -169,3 +169,22 @@ export const getItemsByCategory = async (req, res, next) => {
         next(err);
     }
 };
+export const getNotifications = async (req, res) => {
+  try {
+    console.log("🔍 PARAM RECEIVED:", req.params.userId);
+    console.log("🔍 TYPE:", typeof req.params.userId);
+
+    const notifications = await Notification.find({
+      userId: req.params.userId,
+    });
+
+    console.log("✅ Notifications found:", notifications.length);
+
+    res.json(notifications);
+
+  } catch (error) {
+    console.error("🔥 FULL ERROR OBJECT:", error);
+    console.error("🔥 ERROR MESSAGE:", error.message);
+    res.status(500).json({ error: error.message });
+  }
+};
