@@ -194,7 +194,9 @@ const Auth = () => {
 
 
       // Existing user → send to backend
-      const res = await axios.post(apiUrl('/api/auth/google'), { idToken });
+      // const res = await axios.post(apiUrl('/api/auth/google'), { idToken });
+      const res= await axios.post(`${import.meta.env.VITE_API_URL}/api/auth/google`, { idToken })
+
       localStorage.setItem('authToken', res.data.token);
       localStorage.setItem('loginData', JSON.stringify({ loggedIn: true }));
       localStorage.setItem('UserId', result.user.uid);
