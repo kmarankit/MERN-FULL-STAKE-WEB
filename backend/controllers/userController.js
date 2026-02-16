@@ -1,6 +1,7 @@
 import userModel from "../modals/userModel.js";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
+import admin from "../GoogleAuth/firebaseAdmin.js";
 
 // Create JWT token
 const createToken = (id) => {
@@ -48,47 +49,48 @@ const registerUser = async (req, res) => {
 };
 
 // ================= GOOGLE AUTH =================
-const googleAuth = async (req, res) => {
-  console.log("🚀 googleAuth called with body:", req.body);
 
+const googleAuth = async (req, res) => {
   const { idToken } = req.body;
-  if (!idToken) return res.status(400).json({ success: false, message: "No ID token provided" });
+
+  if (!idToken) {
+    return res.status(400).json({ success: false, message: "No ID token provided" });
+  }
 
   try {
-    // Normally verify Firebase token here using Firebase Admin SDK
-    // For now, we'll just mock user info
-    console.log("💡 Received idToken:", idToken);
+    // ✅ VERIFY REAL FIREBASE TOKEN
+    const decodedToken = await admin.auth().verifyIdToken(idToken);
 
-    // Mock: extract user info from token (replace with real verification)
-    const mockUser = {
-      uid: "firebaseUid123",
-      email: "user@example.com",
-      displayName: "Test User",
-    };
+    const { uid, email, name } = decodedToken;
 
     // Check if user exists
-    let user = await userModel.findOne({ firebaseId: mockUser.uid });
+    let user = await userModel.findOne({ firebaseId: uid });
+
     if (!user) {
-      // Create new user if not exist
-      console.log("🆕 Creating new user from Google Auth");
-      user = new userModel({
-        username: mockUser.displayName,
-        email: mockUser.email,
-        firebaseId: mockUser.uid,
+      // Create new user
+      user = await userModel.create({
+        username: name || "User",
+        email,
+        firebaseId: uid,
         addresses: [],
       });
-      await user.save();
     }
 
     const token = createToken(user._id);
 
-    console.log("✅ Google Auth successful for user:", user._id);
-    res.json({ success: true, token, userId: user._id });
+    res.json({
+      success: true,
+      token,
+      userId: user._id,
+      firebaseId: uid,
+    });
+
   } catch (error) {
-    console.error("🔥 googleAuth error:", error);
-    res.status(500).json({ success: false, message: "Google auth failed" });
+    console.error("🔥 Google Auth error:", error);
+    res.status(401).json({ success: false, message: "Invalid Firebase token" });
   }
 };
+
 
 // ================= ADDRESS =================
 // const addAddress = async (req, res) => {
