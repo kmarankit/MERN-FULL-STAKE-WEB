@@ -1,56 +1,10 @@
-import React, { useState } from 'react';
 import { FiMapPin, FiPhone, FiMail, FiMessageSquare, FiGlobe, FiSmartphone, FiHome, FiArrowRight } from 'react-icons/fi';
-import toast, { Toaster } from 'react-hot-toast';
-import { contactFormFields } from '../../assets/dummydata'
-
 const Contact = () => {
-  const [formData, setFormData] = useState({
-    name: '', phone: '', email: '', address: '', dish: '', query: ''
-  });
+  
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-
-    // 1. Build the message text from your formData:
-    const message = `
-      Name: ${formData.name}
-      Phone: ${formData.phone}
-      Email: ${formData.email}
-      Address: ${formData.address}
-      Dish: ${formData.dish}
-      Query: ${formData.query}
-    `;
-
-    // 2. URL‑encode it
-    const encodedMessage = encodeURIComponent(message);
-
-    // 3. Your WhatsApp number in international format (no “+” or spaces)
-    const whatsappNumber = '917903335271';
-
-    // 4. Build the WhatsApp Web URL:
-    const whatsappUrl = `https://api.whatsapp.com/send?phone=${whatsappNumber}&text=${encodedMessage}`;
-
-    // existing toast
-    toast.success('Opening WhatsApp…', {
-      style: {
-        border: '2px solid #f59e0b',
-        padding: '16px',
-        color: '#fff',
-        background: 'rgba(0,0,0,0.8)',
-        backdropFilter: 'blur(10px)'
-      },
-      iconTheme: { primary: '#f59e0b', secondary: '#fff' },
-    });
-
-    // 5. Redirect:
-    window.open(whatsappUrl, '_blank');
-
-    // reset
-    setFormData({ name: '', phone: '', email: '', address: '', dish: '', query: '' });
-  }
+ 
 
 
-  const handleChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
 
   return (
     <div className="min-h-screen bg-gradient-to-r from-orange-900 via-amber-900 to-green-900 animate-gradient-x py-12 sm:py-16 md:py-20 px-4 sm:px-6 lg:px-8 font-[Poppins] relative overflow-hidden">
@@ -112,52 +66,7 @@ const Contact = () => {
           {/* Contact Form Section */}
           <div className="relative bg-white/5 backdrop-blur-lg rounded-2xl p-8 shadow-2xl animate-slide-in-right border-2 border-amber-500/30 hover:border-amber-500/50 transition-border duration-300">
             <div className="absolute -top-4 -right-4 w-12 h-12 bg-amber-500/30 rounded-full animate-ping-slow"></div>
-            <form onSubmit={handleSubmit} className="space-y-6 relative z-10">
-              {contactFormFields.map(({ label, name, type, placeholder, pattern, Icon }) => (
-                <div key={name}>
-                  <label className="block text-amber-100 text-sm font-medium mb-2">{label}</label>
-                  <div className="relative">
-                    <div className="absolute left-3 top-1/2 transform -translate-y-1/2">
-                      <Icon className="text-amber-500 text-xl animate-pulse" />
-                    </div>
-                    <input
-                      type={type}
-                      name={name}
-                      value={formData[name]}
-                      onChange={handleChange}
-                      className="w-full pl-10 pr-4 py-3 bg-white/10 border-2 border-amber-500/30 rounded-xl text-amber-50 focus:ring-2 focus:ring-amber-500 focus:border-transparent placeholder-amber-200/50"
-                      placeholder={placeholder}
-                      pattern={pattern}
-                      required
-                    />
-                  </div>
-                </div>
-              ))}
-              <div>
-                <label className="block text-amber-100 text-sm font-medium mb-2">Your Query</label>
-                <div className="relative">
-                  <div className="absolute left-3 top-4">
-                    <FiMessageSquare className="text-amber-500 text-xl animate-pulse" />
-                  </div>
-                  <textarea
-                    rows="4"
-                    name="query"
-                    value={formData.query}
-                    onChange={handleChange}
-                    className="w-full pl-10 pr-4 py-3 bg-white/10 border-2 border-amber-500/30 rounded-xl text-amber-50 focus:ring-2 focus:ring-amber-500 focus:border-transparent placeholder-amber-200/50"
-                    placeholder="Type your message here..."
-                    required
-                  ></textarea>
-                </div>
-              </div>
-              <button
-                type="submit"
-                className="w-full bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white font-semibold py-3 px-6 rounded-xl transition-all duration-300 transform hover:scale-[1.02] shadow-lg hover:shadow-amber-500/20 flex items-center justify-center space-x-2 group"
-              >
-                <span>Submit Query</span>
-                <FiArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-              </button>
-            </form>
+          
           </div>
         </div>
       </div>
