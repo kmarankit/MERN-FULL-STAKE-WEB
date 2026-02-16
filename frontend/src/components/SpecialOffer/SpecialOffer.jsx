@@ -130,6 +130,7 @@ import axios from 'axios';
 import { Link } from 'react-router-dom';
 // import { useCart } from '../../CartContext/CartContext';
 import { useCart } from '../../CartContext/CartContext';
+import { apiUrl } from '../../config/api';
 
 // --- Inline SVG Icons ---
 const FaStar = () => (
@@ -166,7 +167,7 @@ const SpecialOffer = () => {
 
     useEffect(() => {
         axios
-            .get('http://localhost:4000/api/items/category/Dhaba%20Special')
+            .get(apiUrl('/api/items/category/Dhaba%20Special'))
             .then(res => setItems(res.data))
             .catch(err => console.error(err));
     }, []);

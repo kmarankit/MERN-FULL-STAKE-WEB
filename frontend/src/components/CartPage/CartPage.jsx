@@ -182,20 +182,18 @@
 // export default CartPage;
 
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useCart } from '../../CartContext/CartContext';
 import { Link, useNavigate } from 'react-router-dom';
 import { FaMinus, FaPlus, FaTrash, FaTimes } from 'react-icons/fa';
 import Navbar from '../../components/Navbar/Navbar';
 import cartVideo from '../../assets/cart video.mp4';
+import { apiUrl } from '../../config/api';
 
-const API_URL = 'http://localhost:4000';
+const API_URL = apiUrl();
 
 const CartPage = () => {
-  console.log('CartPage rendered'); // Debug: check if component renders
-
   const { cartItems, removeFromCart, updateQuantity } = useCart();
-  console.log('Cart items from context:', cartItems); // Debug: check cart data
 
   const [selectedImage, setSelectedImage] = useState(null);
   const navigate = useNavigate();
@@ -206,7 +204,6 @@ const CartPage = () => {
   };
 
   if (!cartItems) {
-    console.log('Cart items not yet loaded'); // Debug
     return (
       <div className="min-h-screen flex items-center justify-center">
         <p className="text-gray-700 text-lg">Loading cart...</p>

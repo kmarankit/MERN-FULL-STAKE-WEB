@@ -4,6 +4,7 @@ import { useCart } from '../../CartContext/CartContext';
 import FloatingCart from '../../components/FloatingCart/FloatingCart.jsx';
 import Logo from "../../assets/logo.png";
 import Navbar from '../../components/Navbar/Navbar'
+import { apiUrl } from '../../config/api';
 
 // --- Inline SVG Icons ---
 const StarIcon = () => (
@@ -108,7 +109,7 @@ const Itempage = () => {
             setProduct(null);
 
             try {
-                const response = await fetch(`http://localhost:4000/api/items/${itemId}`);
+                const response = await fetch(apiUrl(`/api/items/${itemId}`));
                 if (!response.ok) throw new Error('Product not found or network error.');
                 const data = await response.json();
                 setProduct(data);
@@ -117,7 +118,9 @@ const Itempage = () => {
                     setIsSuggestionsLoading(true);
                     setSuggestionsError(null);
                     try {
-                        const suggestionsResponse = await fetch(`http://localhost:4000/api/items/category/${data.category}`);
+                        const suggestionsResponse = await fetch(
+                            apiUrl(`/api/items/category/${encodeURIComponent(data.category)}`)
+                        );
                         if (!suggestionsResponse.ok) throw new Error('Could not fetch suggestions.');
                         let suggestionsData = await suggestionsResponse.json();
                         suggestionsData = suggestionsData.filter(item => item._id !== itemId);

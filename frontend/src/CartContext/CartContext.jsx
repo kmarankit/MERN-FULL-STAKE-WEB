@@ -137,6 +137,7 @@
 import React, { createContext, useContext, useReducer, useEffect, useState, useCallback } from 'react';
 import axios from 'axios';
 import { getAuth } from 'firebase/auth';
+import { apiUrl } from '../config/api';
 
 const CartContext = createContext();
 
@@ -197,7 +198,7 @@ export const CartProvider = ({ children }) => {
       }
       try {
         const token = await auth.currentUser.getIdToken();
-        const res = await axios.get('http://localhost:4000/api/cart', {
+        const res = await axios.get(apiUrl('/api/cart'), {
           headers: { Authorization: `Bearer ${token}` },
           withCredentials: true,
         });
@@ -209,16 +210,19 @@ export const CartProvider = ({ children }) => {
       }
     };
     fetchCart();
-  }, [auth.currentUser]);
+  }, [auth]);
 
-  const getToken = async () => (auth.currentUser ? await auth.currentUser.getIdToken() : null);
+  const getToken = useCallback(async () => {
+    if (!auth.currentUser) return null;
+    return auth.currentUser.getIdToken();
+  }, [auth]);
 
   const addToCart = useCallback(async (item, qty) => {
     const token = await getToken();
     if (!token) return;
     try {
       const res = await axios.post(
-        'http://localhost:4000/api/cart',
+        apiUrl('/api/cart'),
         { itemId: item._id, quantity: qty },
         { headers: { Authorization: `Bearer ${token}` }, withCredentials: true }
       );
@@ -226,14 +230,14 @@ export const CartProvider = ({ children }) => {
     } catch (err) {
       console.error('Add to cart error:', err);
     }
-  }, []);
+  }, [getToken]);
 
   const updateQuantity = useCallback(async (_id, qty) => {
     const token = await getToken();
     if (!token) return;
     try {
       const res = await axios.put(
-        `http://localhost:4000/api/cart/${_id}`,
+        apiUrl(`/api/cart/${_id}`),
         { quantity: qty },
         { headers: { Authorization: `Bearer ${token}` }, withCredentials: true }
       );
@@ -241,13 +245,13 @@ export const CartProvider = ({ children }) => {
     } catch (err) {
       console.error('Update quantity error:', err);
     }
-  }, []);
+  }, [getToken]);
 
   const removeFromCart = useCallback(async (_id) => {
     const token = await getToken();
     if (!token) return;
     try {
-      await axios.delete(`http://localhost:4000/api/cart/${_id}`, {
+      await axios.delete(apiUrl(`/api/cart/${_id}`), {
         headers: { Authorization: `Bearer ${token}` },
         withCredentials: true,
       });
@@ -255,13 +259,13 @@ export const CartProvider = ({ children }) => {
     } catch (err) {
       console.error('Remove from cart error:', err);
     }
-  }, []);
+  }, [getToken]);
 
   const clearCart = useCallback(async () => {
     const token = await getToken();
     if (!token) return;
     try {
-      await axios.post('http://localhost:4000/api/cart/clear', {}, {
+      await axios.post(apiUrl('/api/cart/clear'), {}, {
         headers: { Authorization: `Bearer ${token}` },
         withCredentials: true,
       });
@@ -269,7 +273,7 @@ export const CartProvider = ({ children }) => {
     } catch (err) {
       console.error('Clear cart error:', err);
     }
-  }, []);
+  }, [getToken]);
 
   const totalItems = cartItems.reduce((sum, ci) => sum + ci.quantity, 0);
   const totalAmount = cartItems.reduce(

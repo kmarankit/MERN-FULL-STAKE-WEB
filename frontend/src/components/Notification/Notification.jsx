@@ -7,6 +7,7 @@ import {
 } from "react-icons/hi2"; 
 import { FaCircle } from "react-icons/fa";
 import { socket } from "../../utils/socket.js";
+import { apiUrl } from "../../config/api";
 
 const Notification = ({ open }) => {
   const [notifications, setNotifications] = useState([]);
@@ -16,14 +17,14 @@ const Notification = ({ open }) => {
   // This useEffect fetches the initial list of notifications when the component opens.
   useEffect(() => {
     const fetchInitialNotifications = async () => {
-      const userId = localStorage.getItem("userId");
+      const userId = localStorage.getItem("UserId");
       if (!userId) {
         setLoading(false);
         return;
       }
       try {
-        const token = localStorage.getItem("token");
-        const res = await fetch(`/api/notifications/${userId}`, {
+        const token = localStorage.getItem("authToken");
+        const res = await fetch(apiUrl(`/api/notifications/${userId}`), {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
@@ -88,15 +89,6 @@ const Notification = ({ open }) => {
         notif._id === id ? { ...notif, isRead: true } : notif
       )
     );
-    try {
-      const token = localStorage.getItem("token");
-      await fetch(`/api/notifications/${id}`, {
-        method: 'PATCH',
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-    } catch (error) {
-      console.error("Failed to mark notification as read on server:", error);
-    }
   };
 
   // This function returns the correct icon for the notification type.

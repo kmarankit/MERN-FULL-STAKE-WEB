@@ -308,7 +308,7 @@ const UserDisplay = () => {
     const fetchUsersData = async () => {
       try {
         setIsLoading(true);
-        const res = await fetch("http://localhost:4000/api/users");
+        const res = await fetch("https://mern-full-stake-web.onrender.com/api/users");
         if (!res.ok) throw new Error("Failed to fetch users");
         setUsers(await res.json());
       } catch (err) {
@@ -325,7 +325,7 @@ const UserDisplay = () => {
     const fetchOrders = async () => {
       try {
         setIsLoading(true);
-        const res = await fetch("http://localhost:4000/api/orders/getall");
+        const res = await fetch("https://mern-full-stake-web.onrender.com/api/orders/getall");
         if (!res.ok) throw new Error("Failed to fetch orders");
         const data = await res.json();
         setOrders(data.orders || data);

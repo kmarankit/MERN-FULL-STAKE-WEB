@@ -113,7 +113,7 @@ const VisitorsLocation = () => {
       setIsLoading(true);
       setError(null);
       try {
-        const res = await fetch("http://localhost:4000/api/visitors");
+        const res = await fetch("https://mern-full-stake-web.onrender.com/visitors");
         if (!res.ok) throw new Error(`Error: ${res.status}`);
         const data = await res.json();
         setVisitors(data);

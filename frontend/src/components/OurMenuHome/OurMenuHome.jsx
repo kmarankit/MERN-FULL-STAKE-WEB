@@ -174,6 +174,7 @@ import { Link } from 'react-router-dom';
 import { useCart } from '../../CartContext/CartContext';
 import { FaMinus, FaPlus } from 'react-icons/fa';
 import './Omh.css';
+import { apiUrl } from '../../config/api';
 import Indo from '../../assets/Indo-Chiness.png';
 import Paratha from '../../assets/Paratha2.png';
 import Biryani from '../../assets/Biryani.png';
@@ -221,7 +222,7 @@ const OurMenuHome = () => {
         // Set loading to true whenever you start fetching
         setIsLoading(true);
 
-        axios.get('http://localhost:4000/api/items')
+        axios.get(apiUrl('/api/items'))
             .then(res => {
                 const grouped = res.data.reduce((acc, item) => {
                     acc[item.category] = acc[item.category] || [];

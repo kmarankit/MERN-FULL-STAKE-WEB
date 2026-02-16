@@ -135,12 +135,13 @@
 // export default Auth;
 
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getAuth, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
 import { app } from '../../firebase';
 import axios from 'axios';
 import { FaCheckCircle, FaGoogle } from 'react-icons/fa';
+import { apiUrl } from '../../config/api';
 
 // Toast Component
 const AwesomeToast = ({ message, icon, isError }) => (
@@ -193,7 +194,7 @@ const Auth = () => {
 
 
       // Existing user → send to backend
-      const res = await axios.post('http://localhost:4000/api/auth/google', { idToken });
+      const res = await axios.post(apiUrl('/api/auth/google'), { idToken });
       localStorage.setItem('authToken', res.data.token);
       localStorage.setItem('loginData', JSON.stringify({ loggedIn: true }));
       localStorage.setItem('UserId', result.user.uid);
@@ -212,7 +213,7 @@ const handleCompleteSignUp = async (e) => {
   if (!tempAuthData) return;
 
   try {
-    const res = await axios.post("http://localhost:4000/api/users/register", {
+    const res = await axios.post(apiUrl("/api/users/register"), {
       username: tempAuthData.user.username,
       email: tempAuthData.user.email,
       mobile: mobileNumber,

@@ -1,9 +1,9 @@
-// src/api/axiosConfig.js
 import axios from "axios";
+import { API_BASE_URL } from "./config/api";
 
-const api = axios.create({
-  baseURL: "http://localhost:4000/api", // backend base URL
-  withCredentials: true,                // allow cookies if needed
+const API = axios.create({
+  baseURL: `${API_BASE_URL}/api`,
+  withCredentials: true,
 });
 
-export default api;
+export default API;

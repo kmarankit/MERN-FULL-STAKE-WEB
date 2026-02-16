@@ -3,8 +3,9 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { FaEye, FaEyeSlash, FaCheckCircle,FaArrowLeft  } from 'react-icons/fa';
+import { apiUrl } from '../../config/api';
 
-const url = 'http://localhost:4000'
+const url = apiUrl();
 
 const AwesomeToast = ({ message, icon }) => (
   <div className="animate-slide-in fixed bottom-6 right-6 flex items-center bg-gradient-to-br from-amber-500 to-amber-600 px-6 py-4 rounded-lg shadow-lg border-2 border-amber-300/20">
@@ -36,11 +37,9 @@ const SignUp = () => {
 
     const handleSubmit = async e => {
       e.preventDefault();
-      console.log('🟢 SignUp handleSubmit fired', formData);
     
       try {
         const res = await axios.post(`${url}/api/users/register`, formData);
-        console.log('🟢 register response:', res.data);
     
         // **NEW**: check the actual `success` flag & token
         if (res.data.success && res.data.token) {
@@ -60,7 +59,7 @@ const SignUp = () => {
         // if we get here, it was a 200 but `success: false`
         throw new Error(res.data.message || 'Registration failed.');
       } catch (err) {
-        console.error('🔴 register error:', err);
+        console.error('Register error:', err);
         const msg = err.response?.data?.message || err.message || 'Registration failed.';
         setToast({ visible: true, message: msg, icon: <FaCheckCircle /> });
       }

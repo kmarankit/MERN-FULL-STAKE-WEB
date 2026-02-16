@@ -148,10 +148,11 @@
 import React, { useEffect, useRef } from 'react';
 import { UAParser } from 'ua-parser-js';
 import { v4 as uuidv4 } from 'uuid';
+import { apiUrl } from '../../config/api';
 
 // --- Configuration ---
 const STORE_LOCATION = { lat: 22.895518295476265, lng: 84.8830742134923 };
-const BACKEND_URL = 'http://localhost:4000';
+const BACKEND_URL = apiUrl();
 // ✅ Paste your Google Maps API key here
 const GOOGLE_MAPS_API_KEY = 'AIzaSyD7chhi8vSrxnnNlKhcOkeYAXr0fro2pgQ';
 

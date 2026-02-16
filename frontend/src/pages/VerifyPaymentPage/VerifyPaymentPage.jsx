@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { useCart } from '../../CartContext/CartContext';
+import { apiUrl } from '../../config/api';
 
 const VerifyPaymentPage = () => {
     const { clearCart } = useCart();
@@ -11,8 +12,6 @@ const VerifyPaymentPage = () => {
 
     // Grab token from localStorage
     const token = localStorage.getItem('authToken');
-    const authHeaders = token ? { Authorization: `Bearer ${token}` } : {};
-
     useEffect(() => {
         const params = new URLSearchParams(search);
         const success = params.get('success');
@@ -30,9 +29,9 @@ const VerifyPaymentPage = () => {
         }
 
         // Stripe says success=true & we have a session_id:
-        axios.get('http://localhost:4000/api/orders/confirm', {
+        axios.get(apiUrl('/api/orders/confirm'), {
             params: { session_id },
-            headers: authHeaders
+            headers: token ? { Authorization: `Bearer ${token}` } : {}
         })
             .then(() => {
                 // Only clear the cart on true success:
@@ -42,9 +41,8 @@ const VerifyPaymentPage = () => {
             .catch(err => {
                 console.error('Confirmation error:', err);
                 setStatusMsg('There was an error confirming your payment.');
-                clearCart(false);
             });
-    }, [search, clearCart, navigate, authHeaders]);
+    }, [search, clearCart, navigate, token]);
 
     return (
         <div className="min-h-screen flex items-center justify-center text-white">

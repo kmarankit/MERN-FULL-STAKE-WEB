@@ -18,7 +18,7 @@ const FetchVisitors = () => {
       setIsLoading(true);
       setError(null);
       try {
-        const response = await fetch("http://localhost:4000/api/visitors");
+        const response = await fetch("https://mern-full-stake-web.onrender.com/api/visitors");
         if (!response.ok) throw new Error(`Error: ${response.status}`);
         const data = await response.json();
         // Defensive check to ensure data is an array

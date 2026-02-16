@@ -295,6 +295,7 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import { FaArrowLeft } from "react-icons/fa";
 import axios from "axios";
 import SuccessAnimation from "./SuccessAnimation";
+import { apiUrl } from "../../config/api";
 
 // ✨ NEW: A stylish checkmark icon for our custom checkbox
 const CheckIcon = () => (
@@ -350,13 +351,12 @@ const CheckoutPage = () => {
       setLoading(true);
       if (paymentStatus === "success" && sessionId) {
         axios
-          .post(
-            "http://localhost:4000/api/orders/confirm",
-            { sessionId },
-            { headers: authHeaders }
-          )
+          .get(apiUrl("/api/orders/confirm"), {
+            params: { session_id: sessionId },
+            headers: authHeaders,
+          })
           .then(({ data }) => {
-            handleOrderSuccess(data.order);
+            handleOrderSuccess(data);
           })
           .catch(() => setError("Payment confirmation failed."))
           .finally(() => setLoading(false));
@@ -366,7 +366,7 @@ const CheckoutPage = () => {
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [location.search, authHeaders]);
+  }, [location.search, token]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -390,7 +390,7 @@ const CheckoutPage = () => {
     const total = Number((subtotal + tax + shipping).toFixed(2));
 
     const payload = {
-      user: localStorage.getItem("userId"),
+      user: localStorage.getItem("UserId"),
       firstName: addressData.firstName,
       lastName: addressData.lastName,
       email: addressData.email,
@@ -417,7 +417,7 @@ const CheckoutPage = () => {
       if (!paymentMethod) return setError("Please select a payment method.");
       
       const { data } = await axios.post(
-        "http://localhost:4000/api/orders",
+        apiUrl("/api/orders"),
         payload,
         { headers: authHeaders }
       );

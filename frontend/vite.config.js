@@ -45,12 +45,12 @@ export default defineConfig({
     proxy: {
       // Proxies any request starting with /api to your backend
       '/api': {
-        target: 'http://localhost:4000',
+        target: 'https://mern-full-stake-web.onrender.com/',
         changeOrigin: true,
       },
       // Proxies the WebSocket connection for Socket.IO
       '/socket.io': {
-        target: 'http://localhost:4000',
+        target: 'https://mern-full-stake-web.onrender.com',
         ws: true,
       },
     },

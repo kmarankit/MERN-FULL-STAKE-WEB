@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
+import { apiUrl } from "../../config/api";
 
 const Bill = () => {
   const { _id } = useParams();
@@ -12,7 +13,7 @@ const Bill = () => {
       try {
         const token = localStorage.getItem("authToken");
         // console.log("Ankit Kumar"+orderId)
-        const response = await axios.get(`http://localhost:4000/api/orders/${_id}`, {
+        const response = await axios.get(apiUrl(`/api/orders/${_id}`), {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -26,7 +27,7 @@ const Bill = () => {
     };
 
     fetchOrder();
-  }, [orderId]);
+  }, [_id]);
 
   if (error) {
     return <div className="text-red-500 text-center">{error}</div>;

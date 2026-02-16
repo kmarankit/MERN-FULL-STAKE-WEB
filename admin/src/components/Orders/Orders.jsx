@@ -297,7 +297,7 @@ const Orders = () => {
     const fetchOrders = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:4000/api/orders/getall",
+          "https://mern-full-stake-web.onrender.com/api/orders/getall",
           {
             headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
           }
@@ -339,7 +339,7 @@ const Orders = () => {
 
   const handleStatusChange = async (orderId, newStatus) => {
     try {
-      await axios.put(`http://localhost:4000/api/orders/getall/${orderId}`, {
+      await axios.put(`https://mern-full-stake-web.onrender.com/api/orders/getall/${orderId}`, {
         status: newStatus,
       });
       setOrders((orders) =>

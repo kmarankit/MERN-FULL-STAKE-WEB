@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { socket } from '../utils/socket.js'; // Ensure this path points to your socket client instance
+import { apiUrl } from '../config/api';
 
 // 1. Create the context
 const NotificationContext = createContext();
@@ -26,7 +27,7 @@ export const NotificationProvider = ({ children }) => {
                 return;
             }
             try {
-                const res = await fetch(`/api/notifications/${userId}`, {
+                const res = await fetch(apiUrl(`/api/notifications/${userId}`), {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 if (!res.ok) throw new Error(`API fetch failed with status: ${res.status}`);

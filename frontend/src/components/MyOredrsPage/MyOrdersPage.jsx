@@ -333,6 +333,7 @@ import { GiCampCookingPot } from "react-icons/gi";
 import { MdOutlineDirectionsBike } from "react-icons/md";
 import { LuPackageCheck } from "react-icons/lu";
 import { FiArrowLeft, FiChevronDown } from "react-icons/fi";
+import { apiUrl } from "../../config/api";
 
 // -----------------------------
 // BillModal Component
@@ -548,7 +549,6 @@ const UserOrdersPage = () => {
 
   useEffect(() => {
     const firebaseId = localStorage.getItem("UserId"); // now sending Firebase UID
-    console.log("Check::"+firebaseId);
     if (!firebaseId) {
       setError("Please log in to see your orders.");
       setLoading(false);
@@ -557,7 +557,7 @@ const UserOrdersPage = () => {
 
     const fetchOrders = async () => {
       try {
-        const API_BASE_URL = "http://localhost:4000";
+        const API_BASE_URL = apiUrl();
         const response = await axios.get(`${API_BASE_URL}/api/orders`, {
           params: { firebaseId },
           headers: { Authorization: `Bearer ${localStorage.getItem("authToken")}` },
@@ -569,7 +569,11 @@ const UserOrdersPage = () => {
             ...entry,
             item: {
               ...entry.item,
-              imageUrl: entry.item?.imageUrl ? `${API_BASE_URL}${entry.item.imageUrl}` : null,
+              imageUrl: entry.item?.imageUrl
+                ? entry.item.imageUrl.startsWith("http")
+                  ? entry.item.imageUrl
+                  : `${API_BASE_URL}${entry.item.imageUrl}`
+                : null,
             },
           })),
         }));
