@@ -99,30 +99,31 @@ const userSchema = new mongoose.Schema(
   {
     name: {
       type: String,
-      required: true,
+      required: true
     },
     phone: {
       type: String,
       required: true,
-      unique: true,
+      unique: true
     },
     mpin: {
       type: String,
-      required: true,
+      required: true
     },
     addresses: [
       {
         firstName: String,
         lastName: String,
         phone: String,
+        email: String,
         city: String,
         zip: String,
         landmark: String,
         latitude: Number,
         longitude: Number,
         distance: Number,
-      },
-    ],
+      }
+    ]
   },
   { timestamps: true }
 );
