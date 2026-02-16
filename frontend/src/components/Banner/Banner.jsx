@@ -176,7 +176,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from 'axios';
-import bannerImage from "../../assets/banner.png";
+import bannerImage from "../../assets/Banner.png";
 import { apiUrl } from "../../config/api";
 
 const Banner = () => {
