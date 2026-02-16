@@ -6,7 +6,7 @@ import PlacesAutocomplete, {
   getLatLng,
 } from "react-places-autocomplete";
 import Logo from "../../assets/logo.png";
-import Fssai from "../../assets/Fssailogo.png";
+import Fssai from "../../assets/FssaiLogo.png";
 import Annpurna from"../../assets/1.png";
 import Notification from "../Notification/Notification.jsx";
 import { v4 as uuidv4 } from 'uuid'; // NEW: Import the uuid library
