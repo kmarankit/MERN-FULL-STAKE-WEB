@@ -53,6 +53,13 @@
 //     }
 // };
 import Item from '../modals/item.js';
+import mongoose from "mongoose";
+
+console.log(
+  "Is valid ObjectId:",
+  mongoose.Types.ObjectId.isValid(req.params.userId)
+);
+
 
 export const createItem = async (req, res, next) => {
     try {
