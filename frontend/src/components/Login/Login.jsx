@@ -199,7 +199,7 @@ const Auth = () => {
 
       localStorage.setItem('authToken', res.data.token);
       localStorage.setItem('loginData', JSON.stringify({ loggedIn: true }));
-      localStorage.setItem('UserId', result.user.uid);
+      localStorage.setItem('UserId', res.data.userId);
 
       showToast('Google Authentication Successful!');
       setTimeout(() => navigate('/'), 1000);
@@ -224,7 +224,7 @@ const handleCompleteSignUp = async (e) => {
 
     localStorage.setItem("authToken", res.data.token);
     localStorage.setItem("loginData", JSON.stringify({ loggedIn: true }));
-    localStorage.setItem("UserId", res.data.firebaseId); // ✅ use Firebase UID for consistency
+    localStorage.setItem("UserId", res.data.userId); // ✅ use Firebase UID for consistency
 
     showToast("Profile completed successfully!");
     setTimeout(() => navigate("/"), 1000);

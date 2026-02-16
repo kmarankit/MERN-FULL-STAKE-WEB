@@ -2,10 +2,11 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { socket } from '../utils/socket.js'; // Ensure this path points to your socket client instance
 import { apiUrl } from '../config/api';
 
+
 // 1. Create the context
 const NotificationContext = createContext();
 
-// 2. Create the Provider component
+// 2. Create the Provider comonent
 export const NotificationProvider = ({ children }) => {
     // State for the notification list (for a dropdown/bell icon)
     const [notifications, setNotifications] = useState([]);
@@ -20,14 +21,15 @@ export const NotificationProvider = ({ children }) => {
 
         // --- Step A: Fetch Existing Notifications on Load ---
         const fetchInitialNotifications = async () => {
-            const userId = localStorage.getItem("UserId");
+            const userId = localStorage.getItem("userId");
             const token = localStorage.getItem("authToken");
             if (!userId || !token) {
                 setLoading(false);
                 return;
             }
             try {
-                const res = await fetch(apiUrl(`/api/notifications/${userId}`), {
+                const res = await fetch(apiUrl(`/api/notifications`),
+                 {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 if (!res.ok) throw new Error(`API fetch failed with status: ${res.status}`);

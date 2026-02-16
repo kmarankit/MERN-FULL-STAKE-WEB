@@ -2,20 +2,34 @@
 import express from "express";
 import Notification from "../modals/NotifiSchema.js";
 import mongoose from "mongoose"; // ✅ Import Mongoose to use ObjectId
+import authMiddleware from "../middleware/auth.js";
 
 const router = express.Router();
 
 // Get all notifications for a user
-router.get("/:userId", async (req, res) => {
+// router.get("/:userId", async (req, res) => {
+//   try {
+//     const { userId } = req.params;
+
+//     // ✅ Corrected: Query for the "user" field, not "userId"
+//     const notifications = await Notification.find({
+//       user: new mongoose.Types.ObjectId(userId)
+//     }).sort({ createdAt: -1 });
+
+//     console.log("Notifications found:", notifications);
+
+//     res.json(notifications);
+//   } catch (err) {
+//     console.error("Fetch notifications error:", err.message);
+//     res.status(500).json({ error: "Server error" });
+//   }
+// });
+
+router.get("/", authMiddleware, async (req, res) => {
   try {
-    const { userId } = req.params;
-
-    // ✅ Corrected: Query for the "user" field, not "userId"
     const notifications = await Notification.find({
-      user: new mongoose.Types.ObjectId(userId)
+      user: req.user._id
     }).sort({ createdAt: -1 });
-
-    console.log("Notifications found:", notifications);
 
     res.json(notifications);
   } catch (err) {
@@ -23,7 +37,6 @@ router.get("/:userId", async (req, res) => {
     res.status(500).json({ error: "Server error" });
   }
 });
-
 
 // Create a notification (example)
 router.post("/", async (req, res) => {
