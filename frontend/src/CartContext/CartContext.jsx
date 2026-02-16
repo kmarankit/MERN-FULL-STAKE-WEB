@@ -136,19 +136,20 @@
 // CartContext.jsx
 import React, { createContext, useContext, useReducer, useEffect, useState, useCallback } from 'react';
 import axios from 'axios';
-import { getAuth } from 'firebase/auth';
 import { apiUrl } from '../config/api';
 
 const CartContext = createContext();
 
-// Reducer
+// ---------------- REDUCER ----------------
 const cartReducer = (state, action) => {
   switch (action.type) {
     case 'HYDRATE_CART':
       return action.payload;
+
     case 'ADD_ITEM': {
       const { _id, item, quantity } = action.payload;
       const exists = state.find(ci => ci._id === _id);
+
       if (exists) {
         return state.map(ci =>
           ci._id === _id ? { ...ci, quantity: ci.quantity + quantity } : ci
@@ -156,20 +157,24 @@ const cartReducer = (state, action) => {
       }
       return [...state, { _id, item, quantity }];
     }
-    case 'UPDATE_ITEM': {
-      const { _id, quantity } = action.payload;
-      return state.map(ci => (ci._id === _id ? { ...ci, quantity } : ci));
-    }
+
+    case 'UPDATE_ITEM':
+      return state.map(ci =>
+        ci._id === action.payload._id ? action.payload : ci
+      );
+
     case 'REMOVE_ITEM':
       return state.filter(ci => ci._id !== action.payload);
+
     case 'CLEAR_CART':
       return [];
+
     default:
       return state;
   }
 };
 
-// Initializer
+// ---------------- LOCAL STORAGE INIT ----------------
 const initializer = () => {
   try {
     return JSON.parse(localStorage.getItem('cart') || '[]');
@@ -181,101 +186,116 @@ const initializer = () => {
 export const CartProvider = ({ children }) => {
   const [cartItems, dispatch] = useReducer(cartReducer, [], initializer);
   const [loading, setLoading] = useState(true);
-  const auth = getAuth();
 
-  // Persist locally
+  // Save locally
   useEffect(() => {
     localStorage.setItem('cart', JSON.stringify(cartItems));
   }, [cartItems]);
 
-  // Hydrate cart from server
+  // Get JWT token
+  const getToken = () => {
+    return localStorage.getItem('authToken');
+  };
+
+  // ---------------- FETCH CART ----------------
   useEffect(() => {
     const fetchCart = async () => {
       setLoading(true);
-      if (!auth.currentUser) {
+
+      const token = getToken();
+      if (!token) {
         setLoading(false);
         return;
       }
+
       try {
-        const token = await auth.currentUser.getIdToken();
         const res = await axios.get(apiUrl('/api/cart'), {
-          headers: { Authorization: `Bearer ${token}` },
-          withCredentials: true,
+          headers: { Authorization: `Bearer ${token}` }
         });
+
         dispatch({ type: 'HYDRATE_CART', payload: res.data });
       } catch (err) {
-        console.error('Error fetching cart:', err);
+        console.error('Error fetching cart:', err.response?.data || err.message);
       } finally {
         setLoading(false);
       }
     };
+
     fetchCart();
-  }, [auth]);
+  }, []);
 
-  const getToken = useCallback(async () => {
-    if (!auth.currentUser) return null;
-    return auth.currentUser.getIdToken();
-  }, [auth]);
-
+  // ---------------- ADD ----------------
   const addToCart = useCallback(async (item, qty) => {
-    const token = await getToken();
+    const token = getToken();
     if (!token) return;
+
     try {
       const res = await axios.post(
         apiUrl('/api/cart'),
         { itemId: item._id, quantity: qty },
-        { headers: { Authorization: `Bearer ${token}` }, withCredentials: true }
+        { headers: { Authorization: `Bearer ${token}` } }
       );
+
       dispatch({ type: 'ADD_ITEM', payload: res.data });
     } catch (err) {
-      console.error('Add to cart error:', err);
+      console.error('Add to cart error:', err.response?.data || err.message);
     }
-  }, [getToken]);
+  }, []);
 
+  // ---------------- UPDATE ----------------
   const updateQuantity = useCallback(async (_id, qty) => {
-    const token = await getToken();
+    const token = getToken();
     if (!token) return;
+
     try {
       const res = await axios.put(
         apiUrl(`/api/cart/${_id}`),
         { quantity: qty },
-        { headers: { Authorization: `Bearer ${token}` }, withCredentials: true }
+        { headers: { Authorization: `Bearer ${token}` } }
       );
+
       dispatch({ type: 'UPDATE_ITEM', payload: res.data });
     } catch (err) {
-      console.error('Update quantity error:', err);
+      console.error('Update quantity error:', err.response?.data || err.message);
     }
-  }, [getToken]);
+  }, []);
 
+  // ---------------- REMOVE ----------------
   const removeFromCart = useCallback(async (_id) => {
-    const token = await getToken();
+    const token = getToken();
     if (!token) return;
+
     try {
       await axios.delete(apiUrl(`/api/cart/${_id}`), {
-        headers: { Authorization: `Bearer ${token}` },
-        withCredentials: true,
+        headers: { Authorization: `Bearer ${token}` }
       });
+
       dispatch({ type: 'REMOVE_ITEM', payload: _id });
     } catch (err) {
-      console.error('Remove from cart error:', err);
+      console.error('Remove from cart error:', err.response?.data || err.message);
     }
-  }, [getToken]);
+  }, []);
 
+  // ---------------- CLEAR ----------------
   const clearCart = useCallback(async () => {
-    const token = await getToken();
+    const token = getToken();
     if (!token) return;
+
     try {
-      await axios.post(apiUrl('/api/cart/clear'), {}, {
-        headers: { Authorization: `Bearer ${token}` },
-        withCredentials: true,
-      });
+      await axios.post(
+        apiUrl('/api/cart/clear'),
+        {},
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
       dispatch({ type: 'CLEAR_CART' });
     } catch (err) {
-      console.error('Clear cart error:', err);
+      console.error('Clear cart error:', err.response?.data || err.message);
     }
-  }, [getToken]);
+  }, []);
 
   const totalItems = cartItems.reduce((sum, ci) => sum + ci.quantity, 0);
+
   const totalAmount = cartItems.reduce(
     (sum, ci) => sum + (ci?.item?.price ?? 0) * (ci?.quantity ?? 0),
     0

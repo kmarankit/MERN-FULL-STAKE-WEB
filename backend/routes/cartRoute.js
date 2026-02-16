@@ -32,10 +32,12 @@ import {
   deleteCartItem,
   clearCart,
 } from '../controllers/cartController.js';
-import { verifyFirebaseToken as firebaseAuthMiddleware } from '../middleware/firebaseAuth.js';
+// import { verifyFirebaseToken as firebaseAuthMiddleware } from '../middleware/firebaseAuth.js';
+import authMiddleware from "../middleware/auth.js";
+
 const router = express.Router();
 
-router.use(firebaseAuthMiddleware);
+router.use(authMiddleware);
 
 router.get('/', getCart);
 router.post('/', addToCart);

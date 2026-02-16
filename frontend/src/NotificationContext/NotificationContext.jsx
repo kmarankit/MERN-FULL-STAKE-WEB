@@ -20,28 +20,34 @@ export const NotificationProvider = ({ children }) => {
         console.log("✅ 1. [Context] Initializing notification service...");
 
         // --- Step A: Fetch Existing Notifications on Load ---
-        const fetchInitialNotifications = async () => {
-            const userId = localStorage.getItem("userId");
-            const token = localStorage.getItem("authToken");
-            if (!userId || !token) {
-                setLoading(false);
-                return;
-            }
-            try {
-                const res = await fetch(apiUrl(`/api/notifications`),
-                 {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
-                if (!res.ok) throw new Error(`API fetch failed with status: ${res.status}`);
-                const data = await res.json();
-                setNotifications(data);
-                console.log("✅ 2. [Context] Successfully fetched initial notifications.");
-            } catch (err) {
-                console.error("❌ 2. [Context] Error fetching initial notifications:", err.message);
-            } finally {
-                setLoading(false);
-            }
-        };
+       const fetchInitialNotifications = async () => {
+  const token = localStorage.getItem("authToken");
+
+  if (!token) {
+    setLoading(false);
+    return;
+  }
+
+  try {
+    const res = await fetch(apiUrl("/api/notifications"), {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!res.ok)
+      throw new Error(`API fetch failed with status: ${res.status}`);
+
+    const data = await res.json();
+    setNotifications(data);
+    console.log("✅ Notifications loaded:", data);
+  } catch (err) {
+    console.error("❌ Error fetching notifications:", err.message);
+  } finally {
+    setLoading(false);
+  }
+};
+
         fetchInitialNotifications();
 
         // --- Step B: Prepare and Initiate Socket Connection ---

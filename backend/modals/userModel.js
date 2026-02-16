@@ -62,32 +62,69 @@
 // export default userModel;
 
 
-import mongoose from "mongoose";
+// import mongoose from "mongoose";
 
-const addressSchema = new mongoose.Schema({
-  firstName: String,
-  lastName: String,
-  phone: String,
-  email: String,
-  city: String,
-  zip: String,
-  landmark: String,
-  latitude: Number,
-  longitude: Number,
-  distance: String,
-});
+// const addressSchema = new mongoose.Schema({
+//   firstName: String,
+//   lastName: String,
+//   phone: String,
+//   email: String,
+//   city: String,
+//   zip: String,
+//   landmark: String,
+//   latitude: Number,
+//   longitude: Number,
+//   distance: String,
+// });
+
+// const userSchema = new mongoose.Schema(
+//   {
+//     firebaseId: { type: String, required: true, unique: true }, // ✅ Firebase UID
+//     username: { type: String, required: true },
+//     email: { type: String, required: true, unique: true },
+//     mobile: { type: String, required: true },
+//     addresses: [addressSchema], // ✅ array of addresses
+//   },
+//   { timestamps: true }
+// );
+
+// const userModel = mongoose.models.user || mongoose.model("user", userSchema);
+
+// export default userModel;
+
+
+import mongoose from "mongoose";
 
 const userSchema = new mongoose.Schema(
   {
-    firebaseId: { type: String, required: true, unique: true }, // ✅ Firebase UID
-    username: { type: String, required: true },
-    email: { type: String, required: true, unique: true },
-    mobile: { type: String, required: true },
-    addresses: [addressSchema], // ✅ array of addresses
+    name: {
+      type: String,
+      required: true,
+    },
+    phone: {
+      type: String,
+      required: true,
+      unique: true,
+    },
+    mpin: {
+      type: String,
+      required: true,
+    },
+    addresses: [
+      {
+        firstName: String,
+        lastName: String,
+        phone: String,
+        city: String,
+        zip: String,
+        landmark: String,
+        latitude: Number,
+        longitude: Number,
+        distance: Number,
+      },
+    ],
   },
   { timestamps: true }
 );
 
-const userModel = mongoose.models.user || mongoose.model("user", userSchema);
-
-export default userModel;
+export default mongoose.model("User", userSchema);
