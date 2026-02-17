@@ -561,13 +561,13 @@ const UserOrdersPage = () => {
       try {
         const API_BASE_URL = apiUrl();
         const response = await axios.get(`${API_BASE_URL}/api/orders`, {
-          // params: { firebaseId },
-          // headers: { Authorization: `Bearer ${localStorage.getItem("authToken")}` },
-       headers: { Authorization: `Bearer ${localStorage.getItem("authToken")}` },
-      
+          headers: { Authorization: `Bearer ${localStorage.getItem("token") || localStorage.getItem("authToken")}` },
         });
 
-        const formattedData = (response.data || []).map((order) => ({
+        // Backend returns { success: true, orders: [...] }
+        const ordersData = response.data.orders || response.data || [];
+        
+        const formattedData = (Array.isArray(ordersData) ? ordersData : []).map((order) => ({
           ...order,
           items: (order.items || []).map((entry) => ({
             ...entry,

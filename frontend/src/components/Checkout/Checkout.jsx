@@ -320,7 +320,7 @@ const CheckoutPage = () => {
   // ✨ 1. Add state to manage the terms and conditions checkbox
   const [termsAccepted, setTermsAccepted] = useState(false);
 
-  const token = localStorage.getItem("authToken");
+  const token = localStorage.getItem("token") || localStorage.getItem("authToken");
   const authHeaders = token ? { Authorization: `Bearer ${token}` } : {};
 
   const handleOrderSuccess = (orderData) => {

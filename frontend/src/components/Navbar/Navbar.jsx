@@ -207,8 +207,13 @@ const Navbar = () => {
 
   const confirmLogout = () => {
     localStorage.removeItem('loginData');
+    localStorage.removeItem('token');
+    localStorage.removeItem('authToken');
+    localStorage.removeItem('userId');
+    localStorage.removeItem('UserId');
     setIsAuthenticated(false);
     setShowLogoutConfirm(false);
+    navigate('/');
   };
 
   const cancelLogout = () => {

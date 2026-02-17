@@ -1,13 +1,8 @@
-// controllers/visitorController.js
-
 import Visitor from '../modals/VisitorData.js';
 
-// Add the 'export' keyword before 'const'
+// @desc    Track a new visit or session
+// @route   POST /api/visitors/track
 export const trackVisitor = async (req, res) => {
-
-    console.log('✅ Received visitor tracking request!');
-  console.log('Payload:', req.body); // Log the data to see it
-
   const { visitorId, sessionData } = req.body;
 
   if (!visitorId || !sessionData) {
@@ -15,28 +10,51 @@ export const trackVisitor = async (req, res) => {
   }
 
   try {
-    // Find the visitor by visitorId and push the new session into the sessions array.
-    // The 'upsert: true' option creates a new document if no visitor matches the ID.
+    // We add the IP and User-Agent from the request headers for more accuracy
+    const enrichedSession = {
+      ...sessionData,
+      ip: req.ip || req.headers['x-forwarded-for'],
+      userAgent: req.headers['user-agent'],
+      timestamp: new Date()
+    };
+
     const updatedVisitor = await Visitor.findOneAndUpdate(
       { visitorId: visitorId },
-      { $push: { sessions: sessionData } },
+      { 
+        $push: { 
+          sessions: { 
+            $each: [enrichedSession], 
+            $slice: -100 // Keep only the last 100 sessions to save DB space
+          } 
+        },
+        $set: { lastVisit: new Date() }
+      },
       { upsert: true, new: true, setDefaultsOnInsert: true }
     );
 
-    res.status(200).json({ message: 'Visitor data tracked successfully', data: updatedVisitor });
+    res.status(200).json({ success: true, data: updatedVisitor });
 
   } catch (error) {
     console.error('Error tracking visitor:', error);
-    res.status(500).json({ message: 'Server error while tracking visitor.' });
+    res.status(500).json({ message: 'Server error' });
   }
 };
+
+// @desc    Get all visitor stats (Admin only)
+// @route   GET /api/visitors/all
 export const getAllVisitors = async (req, res) => {
   try {
-    // Find all documents in the Visitor collection
-    const visitors = await Visitor.find({}).sort({ createdAt: -1 }); // Sort by creation date, newest first
-    res.status(200).json(visitors);
+    // We can also calculate total unique visitors count
+    const totalUnique = await Visitor.countDocuments();
+    const visitors = await Visitor.find({}).sort({ lastVisit: -1 }); 
+
+    res.status(200).json({
+      success: true,
+      totalUnique,
+      visitors
+    });
   } catch (error) {
     console.error('Error fetching visitors:', error);
-    res.status(500).json({ message: 'Server error while fetching visitors.' });
+    res.status(500).json({ message: 'Server error' });
   }
 };

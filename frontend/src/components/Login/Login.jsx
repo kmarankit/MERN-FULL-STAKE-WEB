@@ -312,8 +312,9 @@ const Auth = () => {
 
       const res = await axios.post(url, payload);
 
-      localStorage.setItem("authToken", res.data.token);
+      localStorage.setItem("token", res.data.token);
       localStorage.setItem("userId", res.data.userId);
+      localStorage.setItem("loginData", JSON.stringify({ loggedIn: true })); // For backward compatibility
 
       // Success animation trigger
       setSuccess(true);

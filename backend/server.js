@@ -176,7 +176,7 @@
 // server.listen(port, () => {
 //   console.log(`✅ Server Started on http://localhost:${port}`);
 // });
-
+import listEndpoints from 'express-list-endpoints';
 import express from 'express';
 import cors from 'cors';
 import 'dotenv/config';
@@ -306,8 +306,16 @@ app.use('/api/auth', authRoutes);
 app.get('/', (req, res) => res.send('API WORKING'));
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
+
+const endpoints = listEndpoints(app);
+console.log("📌 All Registered Routes:");
+endpoints.forEach((endpoint) => {
+  console.log(`${endpoint.methods.join(", ")}  ${endpoint.path}`);
+});
+
 // Start server
 const port = process.env.PORT || 4000;
 server.listen(port, () => {
 console.log(`✅ Server Started on port ${port}`);
 });
+

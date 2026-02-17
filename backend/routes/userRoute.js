@@ -54,46 +54,33 @@
 
 import express from "express";
 import {
-  signup,
+    signup,
     login,
     addAddress,
     getAddresses,
     deleteAddress,
     getAllusers,
 } from "../controllers/userController.js";
-
 import authMiddleware from "../middleware/auth.js";
 
 const userRouter = express.Router();
 
-/* ================= AUTH ================= */
+/* ================= AUTH (Public) ================= */
 
-// Signup → POST /api/users/register
+// Note: Ensure your frontend calls /api/user/register (or /api/user/signup)
 userRouter.post("/register", signup);
-
-// Login → POST /api/users/login
 userRouter.post("/login", login);
 
+/* ================= ADDRESS (Protected) ================= */
 
-
-
-/* ================= ADDRESS ================= */
-
-// Protected routes (require JWT)
+// JWT required to identify which user is adding/viewing addresses
 userRouter.post("/add-address", authMiddleware, addAddress);
-
 userRouter.get("/addresses", authMiddleware, getAddresses);
+userRouter.delete("/addresses/:addressId", authMiddleware, deleteAddress);
 
-userRouter.delete(
-  "/addresses/:addressId",
-  authMiddleware,
-  deleteAddress
-);
+/* ================= ADMIN (Protected) ================= */
 
-
-/* ================= ADMIN ================= */
-
-userRouter.get("/", getAllusers);
-
+// Only an authenticated user (ideally an Admin) should see the user list
+userRouter.get("/", authMiddleware, getAllusers);
 
 export default userRouter;

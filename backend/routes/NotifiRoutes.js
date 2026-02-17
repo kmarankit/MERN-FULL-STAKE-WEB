@@ -70,34 +70,51 @@ import authMiddleware from "../middleware/auth.js";
 
 const router = express.Router();
 
-// ✅ Get notifications of logged-in user
+// ✅ GET all notifications for the logged-in user
 router.get("/", authMiddleware, async (req, res) => {
   try {
-    const userId = req.user._id; // Mongo ID from JWT
+    const userId = req.user.id; // Consistent with your other controllers
 
-    const notifications = await Notification.find({
-      user: userId
-    }).sort({ createdAt: -1 });
+    const notifications = await Notification.find({ user: userId })
+      .sort({ createdAt: -1 })
+      .limit(20); // Limit to last 20 to keep the frontend fast
 
     res.json(notifications);
   } catch (err) {
-    console.error("Fetch notifications error:", err.message);
     res.status(500).json({ error: "Server error" });
   }
 });
 
-// ✅ Create notification
+// ✅ POST: Create notification (Internal use, e.g., from Order Controller)
 router.post("/", async (req, res) => {
   try {
     const notif = new Notification(req.body);
     await notif.save();
 
-    const userRoom = String(notif.user);
-    req.io.to(userRoom).emit("newNotification", notif);
+    // Real-time emit if Socket.io is attached to the request
+    if (req.io) {
+      const userRoom = String(notif.user);
+      req.io.to(userRoom).emit("newNotification", notif);
+    }
 
     res.status(201).json(notif);
   } catch (err) {
-    console.error("Create notification error:", err.message);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+// ✅ PATCH: Mark a specific notification as read
+router.patch("/:id/read", authMiddleware, async (req, res) => {
+  try {
+    const notification = await Notification.findOneAndUpdate(
+      { _id: req.params.id, user: req.user.id },
+      { isRead: true },
+      { new: true }
+    );
+    
+    if (!notification) return res.status(404).json({ message: "Not found" });
+    res.json(notification);
+  } catch (err) {
     res.status(500).json({ error: "Server error" });
   }
 });

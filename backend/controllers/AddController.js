@@ -1,77 +1,86 @@
-// controllers/userController.js
 import userModel from '../modals/userModel.js';
 import jwt from 'jsonwebtoken';
-import bcrypt from 'bcrypt';
-import validator from 'validator';
+import bcrypt from 'bcryptjs'; // Using bcryptjs for consistency
 
+// Helper to create JWT
 const createToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET || 'secretkey', { expiresIn: '7d' });
 };
 
-// LOGIN
+// --- LOGIN (using Phone & MPIN) ---
 export const loginUser = async (req, res) => {
-  const { email, password } = req.body;
+  const { phone, mpin } = req.body;
   try {
-    const user = await userModel.findOne({ email });
-    if (!user) return res.status(404).json({ success: false, message: "User Doesn't Exist" });
+    // 1. Find user by phone
+    const user = await userModel.findOne({ phone });
+    if (!user) return res.status(404).json({ success: false, message: "User doesn't exist" });
 
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) return res.status(401).json({ success: false, message: "Invalid Credentials" });
+    // 2. Compare mpin (bcrypt handles the hashed comparison)
+    // Note: If you added the 'compareMpin' method to your model, you can use user.compareMpin(mpin)
+    const isMatch = await bcrypt.compare(mpin, user.mpin);
+    if (!isMatch) return res.status(401).json({ success: false, message: "Invalid MPIN" });
 
+    // 3. Generate token
     const token = createToken(user._id);
-    // Return token and userId so frontend can use it
-    res.json({ success: true, token, userId: user._id, username: user.username });
+
+    res.json({ 
+      success: true, 
+      token, 
+      userId: user._id, 
+      name: user.name 
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ success: false, message: "Server error" });
   }
 };
 
-// REGISTER
+// --- REGISTER (using Name, Phone & MPIN) ---
 export const registerUser = async (req, res) => {
-  const { username, password, email } = req.body;
+  const { name, phone, mpin } = req.body;
   try {
-    const exists = await userModel.findOne({ email });
-    if (exists) return res.status(400).json({ success: false, message: "User Already Exists" });
+    // 1. Check if phone already registered
+    const exists = await userModel.findOne({ phone });
+    if (exists) return res.status(400).json({ success: false, message: "Mobile number already exists" });
 
-    if (!validator.isEmail(email)) return res.status(400).json({ success: false, message: "Please Enter A Valid Email" });
-    if (!password || password.length < 8) return res.status(400).json({ success: false, message: "Please Enter A Strong Password (min 8 chars)" });
+    // 2. Simple validation for 4-digit MPIN
+    if (!mpin || mpin.length !== 4) {
+        return res.status(400).json({ success: false, message: "MPIN must be exactly 4 digits" });
+    }
 
+    // 3. Hash the MPIN (If you didn't add a pre-save hook in the model)
     const salt = await bcrypt.genSalt(10);
-    const hashed = await bcrypt.hash(password, salt);
+    const hashedMpin = await bcrypt.hash(mpin, salt);
 
+    // 4. Create new user
     const newUser = new userModel({
-      username,
-      email,
-      password: hashed,
+      name,
+      phone,
+      mpin: hashedMpin, // Save the hashed version
       addresses: [],
     });
 
     const user = await newUser.save();
     const token = createToken(user._id);
 
-    res.status(201).json({ success: true, token, userId: user._id, username: user.username });
+    res.status(201).json({ success: true, token, userId: user._id, name: user.name });
   } catch (error) {
     console.error(error);
     res.status(500).json({ success: false, message: "Server error" });
   }
 };
 
-// ADD ADDRESS (POST /api/users/:userId/add-address)
+// --- ADDRESS CONTROLLERS (Stay mostly the same) ---
 export const addAddress = async (req, res) => {
   try {
     const { userId } = req.params;
-    const address = req.body; // expects { street, city, state, zip, landmark? }
+    const addressData = req.body; 
 
     const user = await userModel.findById(userId);
     if (!user) return res.status(404).json({ success: false, message: "User not found" });
 
-    // Basic validation
-    if (!address || !address.street || !address.city || !address.state || !address.zip) {
-      return res.status(400).json({ success: false, message: "Address fields missing" });
-    }
-
-    user.addresses.push(address);
+    // Ensure we are adding to the addresses array
+    user.addresses.push(addressData);
     await user.save();
 
     res.json({ success: true, message: "Address added", addresses: user.addresses });
@@ -81,7 +90,6 @@ export const addAddress = async (req, res) => {
   }
 };
 
-// GET ADDRESSES (GET /api/users/:userId/addresses)
 export const getAddresses = async (req, res) => {
   try {
     const { userId } = req.params;

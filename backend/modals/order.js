@@ -1,4 +1,3 @@
-// models/order.js
 import mongoose from 'mongoose';
 
 const orderItemSchema = new mongoose.Schema({
@@ -11,26 +10,25 @@ const orderItemSchema = new mongoose.Schema({
 }, { _id: true });
 
 const orderSchema = new mongoose.Schema({
-  // User Information
+  // Link to your new MongoDB User
   user: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'User'
+    ref: 'User',
+    required: true, // Now required because we use JWT
+    index: true
   },
-  firebaseId: { type: String, required: true, unique: true }, // ✅ Firebase UID
-  email: { type: String, required: true, index: true },
+  // We removed firebaseId here to prevent "Validation Errors"
+  email: { type: String, required: true },
   firstName: { type: String, required: true },
   lastName: { type: String, required: true },
   phone: { type: String, required: true },
 
-  // Shipping Information
   address: { type: String, required: true },
   city: { type: String, required: true },
   zipCode: { type: String, required: true },
 
-  // Order Items (nested item object)
   items: [orderItemSchema],
 
-  // Payment Details
   paymentMethod: {
     type: String,
     required: true,
@@ -39,7 +37,6 @@ const orderSchema = new mongoose.Schema({
   },
   paymentIntentId: { type: String },
   sessionId: { type: String, index: true },
-  transactionId: { type: String },
   paymentStatus: {
     type: String,
     enum: ['pending', 'succeeded', 'failed'],
@@ -47,34 +44,25 @@ const orderSchema = new mongoose.Schema({
     index: true
   },
 
-  // Order Calculations
   subtotal: { type: Number, required: true, min: 0 },
   tax: { type: Number, required: true, min: 0 },
   shipping: { type: Number, required: true, min: 0, default: 0 },
   total: { type: Number, required: true, min: 0 },
 
-  // Order Status Tracking
+  // Updated Status to match your Controller's Switch Statement
   status: {
     type: String,
-    enum: ['processing', 'outForDelivery', 'delivered'],
+    enum: ['processing', 'Food Preparing', 'outForDelivery', 'delivered'],
     default: 'processing',
     index: true
   },
   expectedDelivery: Date,
   deliveredAt: Date,
 
-  // Timestamps
-  createdAt: { type: Date, default: Date.now, index: true },
-  updatedAt: { type: Date, default: Date.now }
-});
+}, { timestamps: true }); // Uses built-in timestamps for createdAt/updatedAt
 
+// Optimized Indexes
 orderSchema.index({ user: 1, createdAt: -1 });
-orderSchema.index({ status: 1, paymentStatus: 1 });
-
-orderSchema.pre('save', function (next) {
-  this.updatedAt = new Date();
-  next();
-});
 
 const Order = mongoose.model('Order', orderSchema);
 export default Order;

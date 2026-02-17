@@ -21,7 +21,7 @@ export const NotificationProvider = ({ children }) => {
 
         // --- Step A: Fetch Existing Notifications on Load ---
        const fetchInitialNotifications = async () => {
-  const token = localStorage.getItem("authToken");
+  const token = localStorage.getItem("token") || localStorage.getItem("authToken");
 
   if (!token) {
     setLoading(false);
@@ -51,7 +51,7 @@ export const NotificationProvider = ({ children }) => {
         fetchInitialNotifications();
 
         // --- Step B: Prepare and Initiate Socket Connection ---
-        const token = localStorage.getItem('authToken');
+        const token = localStorage.getItem('token') || localStorage.getItem('authToken');
         if (!token) {
             console.error("❌ 3. [Context] No auth token found. Socket connection aborted.");
             return;

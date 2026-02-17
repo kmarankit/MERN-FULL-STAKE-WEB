@@ -98,9 +98,11 @@
 import express from "express";
 import { signup, login } from "../controllers/userController.js";
 
-const router = express.Router();
+const authRouter = express.Router();
 
-router.post("/signup", signup);
-router.post("/login", login);
+// Publicly accessible routes
+// These create the JWT token your app needs
+authRouter.post("/signup", signup);
+authRouter.post("/login", login);
 
-export default router;
+export default authRouter;
