@@ -390,7 +390,8 @@ const CheckoutPage = () => {
     const total = Number((subtotal + tax + shipping).toFixed(2));
 
     const payload = {
-      user: localStorage.getItem("UserId"),
+      // user: localStorage.getItem("UserId"),
+      user: localStorage.getItem("userId") || localStorage.getItem("UserId"),
       firstName: addressData.firstName,
       lastName: addressData.lastName,
       email: addressData.email,

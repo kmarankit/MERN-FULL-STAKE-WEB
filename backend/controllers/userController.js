@@ -331,12 +331,16 @@ const getAllusers = async (req, res) => {
 
 const deleteAddress = async (req, res) => {
   try {
-    const { userId, addressId } = req.params; // Firebase UID + address _id
+    // const { userId, addressId } = req.params; // Firebase UID + address _id
 
-    const user = await userModel.findOne({ firebaseId: userId });
+    const { addressId } = req.params;
+    const user = await userModel.findById(req.user._id);
+
+    // const user = await userModel.findOne({ firebaseId: userId });
     if (!user) return res.status(404).json({ success: false, message: "User not found" });
 
-    user.addresses = user.addresses.filter(addr => addr._id.toString() !== addressId);
+    // user.addresses = user.addresses.filter(addr => addr._id.toString() !== addressId);
+    user.addresses = user.addresses.filter((addr) => addr._id.toString() !== addressId);
     await user.save();
 
     res.json({ success: true, message: "Address deleted successfully", addresses: user.addresses });
@@ -349,11 +353,13 @@ const deleteAddress = async (req, res) => {
 // ================= GET ADDRESSES =================
 const getAddresses = async (req, res) => {
   try {
-    const { userId } = req.params; // Firebase UID
-    const user = await userModel.findOne({ firebaseId: userId });
+    // const { userId } = req.params; // Firebase UID
+    // const user = await userModel.findOne({ firebaseId: userId });
+    const user = await userModel.findById(req.user._id);
     if (!user) return res.status(404).json({ success: false, message: "User not found" });
 
-    res.json({ success: true, addresses: user.addresses });
+    // res.json({ success: true, addresses: user.addresses });
+      res.json({ success: true, addresses: user.addresses || [] });
   } catch (error) {
     console.error("🔥 getAddresses error:", error);
     res.status(500).json({ success: false, message: "Error fetching addresses" });
@@ -363,7 +369,7 @@ const getAddresses = async (req, res) => {
 const addAddress = async (req, res) => {
   try {
     const {
-      userId,  // this is Firebase UID
+      // userId,  // this is Firebase UID
       firstName,
       lastName,
       phone,
@@ -377,8 +383,11 @@ const addAddress = async (req, res) => {
     } = req.body;
 
     // Find user by Firebase UID
-    const user = await userModel.findOne({ firebaseId: userId });
-    if (!user) return res.status(404).json({ message: "User not found" });
+    // const user = await userModel.findOne({ firebaseId: userId });
+    // if (!user) return res.status(404).json({ message: "User not found" });
+
+ const user = await userModel.findById(req.user._id);
+    if (!user) return res.status(404).json({ success: false, message: "User not found" });
 
     // Add new address
     const newAddress = {
@@ -404,7 +413,8 @@ const addAddress = async (req, res) => {
     });
   } catch (error) {
     console.error("🔥 addAddress error:", error);
-    return res.status(500).json({ message: "Something went wrong" });
+      return res.status(500).json({ success: false, message: "Something went wrong" });
+    // return res.status(500).json({ message: "Something went wrong" });
   }
 };
 

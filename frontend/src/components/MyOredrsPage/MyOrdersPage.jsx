@@ -548,8 +548,10 @@ const UserOrdersPage = () => {
   const [selectedOrderForBill, setSelectedOrderForBill] = useState(null);
 
   useEffect(() => {
-    const firebaseId = localStorage.getItem("UserId"); // now sending Firebase UID
-    if (!firebaseId) {
+    // const firebaseId = localStorage.getItem("UserId"); // now sending Firebase UID
+    // if (!firebaseId) {
+    const userId = localStorage.getItem("userId") || localStorage.getItem("UserId");
+    if (!userId) {
       setError("Please log in to see your orders.");
       setLoading(false);
       return;
@@ -559,8 +561,10 @@ const UserOrdersPage = () => {
       try {
         const API_BASE_URL = apiUrl();
         const response = await axios.get(`${API_BASE_URL}/api/orders`, {
-          params: { firebaseId },
-          headers: { Authorization: `Bearer ${localStorage.getItem("authToken")}` },
+          // params: { firebaseId },
+          // headers: { Authorization: `Bearer ${localStorage.getItem("authToken")}` },
+       headers: { Authorization: `Bearer ${localStorage.getItem("authToken")}` },
+      
         });
 
         const formattedData = (response.data || []).map((order) => ({

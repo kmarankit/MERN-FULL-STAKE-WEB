@@ -66,7 +66,8 @@ const ArrowLeftIcon = () => (
     longitude: null,
   });
 
-  const userId = localStorage.getItem("UserId");
+  // const userId = localStorage.getItem("UserId");
+const userId = localStorage.getItem("userId") || localStorage.getItem("UserId");
 
   const showToast = (msg) => {
     setToastMessage(msg);
@@ -78,7 +79,9 @@ const ArrowLeftIcon = () => (
     if (!userId) return;
     try {
       console.log("ankit Kumar:" + userId)
-      const res = await api.get(`/users/${userId}/addresses`);
+      // const res = await api.get(`/users/${userId}/addresses`);
+      
+       const res = await api.get(`/users/addresses`);
       if (res.data.success) setAddresses(res.data.addresses || []);
       else showToast(res.data.message || "Could not fetch addresses");
     } catch (err) {
@@ -245,7 +248,9 @@ const handleSave = async () => {
   }
 
   try {
-    const payload = { userId, ...formData, distance };
+    // const payload = { userId, ...formData, distance };
+   
+    const payload = { ...formData, distance };
     const res = await api.post("/users/add-address", payload);
 
     if (res.data.success) {
@@ -276,7 +281,9 @@ const handleSave = async () => {
   const handleDelete = async (id) => {
     if (!userId || !id) return;
     try {
-      await api.delete(`/users/${userId}/addresses/${id}`);
+      // await api.delete(`/users/${userId}/addresses/${id}`);
+    
+     await api.delete(`/users/addresses/${id}`);
       showToast("✅ Address deleted successfully");
       await fetchAddresses();
     } catch (err) {

@@ -92,6 +92,7 @@ import { CartItem } from '../modals/cartItem.js';
 
 // GET /api/cart
 export const getCart = asyncHandler(async (req, res) => {
+  
   const userId = req.user.uid; // Firebase UID
   const items = await CartItem.find({ user: userId }).populate('item');
   const formatted = items.map(ci => ({

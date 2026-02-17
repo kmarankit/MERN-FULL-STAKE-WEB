@@ -17,14 +17,16 @@ const Notification = ({ open }) => {
   // This useEffect fetches the initial list of notifications when the component opens.
   useEffect(() => {
     const fetchInitialNotifications = async () => {
-      const userId = localStorage.getItem("UserId");
+      // const userId = localStorage.getItem("UserId");
+      const userId = localStorage.getItem("userId") || localStorage.getItem("UserId");
       if (!userId) {
         setLoading(false);
         return;
       }
       try {
         const token = localStorage.getItem("authToken");
-        const res = await fetch(apiUrl(`/api/notifications/${userId}`), {
+        const res = await fetch(apiUrl(`/api/notifications`), {
+        // const res = await fetch(apiUrl(`/api/notifications/${userId}`), {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
