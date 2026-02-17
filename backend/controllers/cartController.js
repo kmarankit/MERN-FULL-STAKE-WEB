@@ -106,40 +106,46 @@ export const getCart = asyncHandler(async (req, res) => {
 // POST /api/cart
 export const addToCart = asyncHandler(async (req, res) => {
   const { itemId, quantity } = req.body;
+  
   if (!itemId || typeof quantity !== 'number') {
     res.status(400);
     throw new Error('itemId and quantity (number) are required');
   }
 
-  const userId = req.user.uid;
+  const userId = req.user?.uid; // Use optional chaining to prevent crash
+  if (!userId) {
+    res.status(401);
+    throw new Error('Not authorized, no user ID found');
+  }
 
   let cartItem = await CartItem.findOne({ user: userId, item: itemId });
 
   if (cartItem) {
-    cartItem.quantity = Math.max(1, cartItem.quantity + quantity);
+    cartItem.quantity = cartItem.quantity + quantity;
+
     if (cartItem.quantity < 1) {
-      await cartItem.remove();
-      return res.json({ _id: cartItem._id.toString(), item: cartItem.item, quantity: 0 });
+      const deletedId = cartItem._id;
+      await CartItem.deleteOne({ _id: cartItem._id }); // Use deleteOne
+      return res.json({ _id: deletedId.toString(), quantity: 0 });
     }
+
     await cartItem.save();
-    await cartItem.populate('item');
-    return res.status(200).json({
-      _id: cartItem._id.toString(),
-      item: cartItem.item,
-      quantity: cartItem.quantity,
+  } else {
+    // If it doesn't exist, create it
+    cartItem = await CartItem.create({
+      user: userId,
+      item: itemId,
+      quantity: Math.max(1, quantity),
     });
   }
 
-  cartItem = await CartItem.create({
-    user: userId,
-    item: itemId,
-    quantity,
-  });
-  await cartItem.populate('item');
-  res.status(201).json({
-    _id: cartItem._id.toString(),
-    item: cartItem.item,
-    quantity: cartItem.quantity,
+  // Populate after saving/creating to ensure the frontend gets the item details
+  const populatedItem = await CartItem.findById(cartItem._id).populate('item');
+
+  res.status(cartItem.isNew ? 201 : 200).json({
+    _id: populatedItem._id.toString(),
+    item: populatedItem.item,
+    quantity: populatedItem.quantity,
   });
 });
 
